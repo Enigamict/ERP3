@@ -19,7 +19,7 @@
 #define BGP_LEN 2
 
 struct config {
-  uint8_t as_number[2];
+  uint16_t as_number;
   struct in_addr router_id;
   struct neighbor *neighbors[MAX_NEIGH];
   struct network *networks[MAX_NETWORK];
@@ -48,11 +48,11 @@ struct message {
 
 struct bgp_open {
  uint8_t marker[BGP_MARKER];
- uint8_t len[BGP_LEN];
+ uint16_t len;
  uint8_t type;
  uint8_t version;
- uint8_t my_autonomous_system[2];
- uint8_t hold_time[2];
+ uint16_t my_autonomous_system;
+ uint16_t hold_time;
  struct in_addr bgp_identifier;
  uint16_t opt_parm_length;
  // optionどうやって書こう

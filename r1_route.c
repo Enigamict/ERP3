@@ -27,13 +27,14 @@ int main(int argc, char** argv) {
   int sock0;
   int sock;
   int option = 1;
+  char hex_ok[4];
   memset(&open, 0x0, sizeof(open));
 
   uint8_t marker[16]  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   uint8_t bgp_len[2] = {0x00, 0x00};
 
   uint8_t hold_time[2] = {0x00, 0xB4};
-
+  uint8_t as[2] = {0xFD, 0xE9}; 
 
   sock0 = socket(AF_INET, SOCK_STREAM, 0);
   int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
@@ -50,12 +51,12 @@ int main(int argc, char** argv) {
   int len = sizeof(client);
   sock = accept(sock0, (struct sockaddr *)&client, &len);
   memcpy(open.marker, marker, 16);
-  memcpy(open.len, bgp_len, 2);
+  open.len = 0x0000;
   open.type = BGP_MSG_TYPE_OPEN; 
 
   open.version = 0x04;
-  memcpy(open.my_autonomous_system, cfg.as_number, 2);
-  memcpy(open.hold_time, hold_time, 2);
+  open.my_autonomous_system = htons(0xFDE9);
+  open.hold_time = htons(0x00B4);
   open.bgp_identifier = cfg.router_id;
   open.opt_parm_length = 0x0000;
 
