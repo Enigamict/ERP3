@@ -16,7 +16,6 @@
 #define BGP_MSG_TYPE_ROUTEREFRESH 5
 
 #define BGP_MARKER 16
-#define BGP_LEN 2
 
 struct config {
   uint16_t as_number;
@@ -54,7 +53,7 @@ struct bgp_open {
  uint16_t my_autonomous_system;
  uint16_t hold_time;
  struct in_addr bgp_identifier;
- uint16_t opt_parm_length;
+ uint8_t opt_parm_length;
  // optionどうやって書こう
 };
 

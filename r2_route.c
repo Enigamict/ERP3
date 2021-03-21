@@ -65,14 +65,14 @@ int main(int argc, char** argv)
 
     
     memcpy(open.marker, marker, 16);
-    open.len = 0x0000;
+    open.len = htons(0x001D);
     open.type = BGP_MSG_TYPE_OPEN; 
 
     open.version = 0x04;
     open.my_autonomous_system = htons(0xFDE9);
     open.hold_time = htons(0x00B4);
     open.bgp_identifier = cfg.router_id;
-    open.opt_parm_length = 0x0000;
+    open.opt_parm_length = 0x00;
     sendto(sock, &open, sizeof(open),
         0, (struct sockaddr *)&addr, sizeof(addr));
 
