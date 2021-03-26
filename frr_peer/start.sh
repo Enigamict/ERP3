@@ -2,5 +2,5 @@
 set -eu
 set -x
 
-VBoxManage startvm "sbuntu1"
-VBoxManage startvm "sbuntu2"
+VBoxManage startvm subntu1
+VBoxManage startvm subuntu2

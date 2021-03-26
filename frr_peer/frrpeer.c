@@ -29,6 +29,7 @@ int main(int argc, char** argv)
   struct sockaddr_in addr;
   struct sockaddr_in server;
   struct bgp_open open;
+  struct bgp_keepalive kep;
   int sock;
   int sock0;
   char buf[1000];
@@ -71,9 +72,14 @@ int main(int argc, char** argv)
     open.hold_time = htons(0x00B4);
     open.bgp_identifier = cfg.router_id;
     open.opt_parm_length = 0x00;
-    sendto(sock, &open, sizeof(open),
+    sendto(sock, &open, sizeof(open) - 3,
         0, (struct sockaddr *)&addr, sizeof(addr));
 
+    memcpy(kep.marker, marker, 16);
+    kep.len = htons(0x0013);
+    open.type = BGP_MSG_TYPE_OPEN; 
+    sendto(sock, &kep, sizeof(kep) - 1,
+        0, (struct sockaddr *)&addr, sizeof(addr));
   }
    /* socketの終了 */
   close(sock);

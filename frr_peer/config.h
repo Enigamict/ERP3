@@ -38,6 +38,11 @@ struct bgp_open {
  uint8_t opt_parm_length;
 };
 
+struct bgp_keepalive {
+ uint8_t marker[BGP_MARKER];
+ uint16_t len;
+ uint8_t type;
+};
 static inline void print_config(const struct config* cfg) 
 {
   char addr_str[256];
