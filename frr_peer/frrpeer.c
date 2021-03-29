@@ -50,37 +50,40 @@ int main(int argc, char** argv)
 
    /* サーバに接続 */
   connect(sock, (struct sockaddr *)&server, sizeof(server));
-  memset(buf, 0, sizeof(buf));
-  n = recv(sock, buf, sizeof(buf), 0);
-  if (n < 1) {
-    printf("okasii");
-    return -1;
-  }
   
-  struct bgp_open *bgp_open =  (struct bgp_open *)buf;
-  if (bgp_open->type == BGP_MSG_TYPE_OPEN) {
-    printf("BGP OPEN");
-    printf("send to...");
+  printf("BGP OPEN");
+  printf("send to...");
 
-    
-    memcpy(open.marker, marker, 16);
-    open.len = htons(0x001D);
-    open.type = BGP_MSG_TYPE_OPEN; 
 
-    open.version = 0x04;
-    open.my_autonomous_system = htons(0xFDE9);
-    open.hold_time = htons(0x00B4);
-    open.bgp_identifier = cfg.router_id;
-    open.opt_parm_length = 0x00;
-    sendto(sock, &open, sizeof(open) - 3,
-        0, (struct sockaddr *)&addr, sizeof(addr));
+  memcpy(open.marker, marker, 16);
+  open.len = htons(0x001D);
+  open.type = BGP_MSG_TYPE_OPEN; 
 
+  open.version = 0x04;
+  open.my_autonomous_system = htons(0xFDE9);
+  open.hold_time = htons(0x00B4);
+  open.bgp_identifier = cfg.router_id;
+  open.opt_parm_length = 0x00;
+  sendto(sock, &open, sizeof(open) - 3,
+      0, (struct sockaddr *)&addr, sizeof(addr));
+
+  }
+  while(1) {
+    memset(buf, 0, sizeof(buf));
+    n = recv(sock, buf, sizeof(buf), 0);
+    if (n < 1) {
+      printf("okasii");
+      return -1;
+  }
+    struct bgp_keepalive *bgp_keepalive = (struct bgp_keepalive *)buf;
+    if (bgp_keepalive->type == BGP_MSG_TYPE_KEEPALIVE) {
     memcpy(kep.marker, marker, 16);
     kep.len = htons(0x0013);
     open.type = BGP_MSG_TYPE_OPEN; 
     sendto(sock, &kep, sizeof(kep) - 1,
         0, (struct sockaddr *)&addr, sizeof(addr));
   }
+ }
    /* socketの終了 */
   close(sock);
   return 0;
