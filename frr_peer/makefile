@@ -1,5 +1,4 @@
 all:
-	sudo gcc -o frrpeer frrpeer.c -ljansson
-	gcc -o libconfig libconfig.c -ljansson
+	sudo gcc -o frrpeer frrpeer.c
 run:
-	sudo ./r1_route test.json
+	sudo ./frrpeer
