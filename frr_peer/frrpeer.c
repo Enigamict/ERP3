@@ -20,6 +20,7 @@ int main(int argc, char** argv)
     struct sockaddr_in server;
     struct bgp_open open;
     struct bgp_keepalive kep;
+    struct bgp_update upd;
     int sock;
     char buf[1000];
     int n;
@@ -27,11 +28,17 @@ int main(int argc, char** argv)
     memset(&open, 0x0, sizeof(open));
 
     uint8_t marker[BGP_MARKER] = {0xFF, 0xFF, 0xFF, 0xFF
-              , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                            0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+          0xFF, 0xFF, 0xFF, 0xFF};
 
     uint8_t option_val[BGP_OPEN_OPT] = {0x02, 0x06, 0x01
-                          , 0x04, 0x00, 0x01, 0x00, 0x01};
+        , 0x04, 0x00, 0x01, 0x00, 0x01, 0x02, 0x02, 0x80,
+    0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x06, 0x41, 0x04,
+    0x00, 0x00, 0xFD, 0xE8, 0x02, 0x06, 0x45, 0x04, 0x00,
+    0x01, 0x01, 0x00, 0x02, 0x08, 0x49, 0x06, 0x04, 0x6E,
+    0x65, 0x74, 0x31, 0x00, 0x02, 0x04, 0x40, 0x02, 0x00,
+    0x78};
+
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -40,14 +47,9 @@ int main(int argc, char** argv)
     server.sin_addr.s_addr = inet_addr("10.255.1.1");
 
     connect(sock, (struct sockaddr *)&server, sizeof(server));
-
-    printf("BGP OPEN \n");
-    printf("send to... \n");
-
-
     memcpy(open.marker, marker, 16);
 
-    open.len = htons(0x0025);
+    open.len = htons(0x004D);
 
     open.type = BGP_MSG_TYPE_OPEN;
 
@@ -59,12 +61,15 @@ int main(int argc, char** argv)
 
     inet_pton(AF_INET, "1.1.1.1", &open.bgp_identifier);
 
-    open.opt_parm_length = 0x08;
+    open.opt_parm_length = 0x30;
 
-    memcpy(open.opt, option_val, 8);
+    memcpy(open.opt, option_val, 48);
 
     sendto(sock, &open, sizeof(open) - 3,
         0, (struct sockaddr *)&addr, sizeof(addr));
+
+    printf("BGP Open\n");
+
     while(1) {
       memset(buf, 0, sizeof(buf));
       n = recv(sock, buf, sizeof(buf), 0);
@@ -76,8 +81,7 @@ int main(int argc, char** argv)
       struct bgp_keepalive *bgp_keepalive =  (struct bgp_keepalive *)buf;
       if (bgp_keepalive->type == BGP_MSG_TYPE_KEEPALIVE) {
 
-         printf("BGP Keep alive \n");
-         printf("send to... \n");
+         printf("keep alive send to... \n");
 
          memcpy(kep.marker, marker, 16);
 
@@ -87,8 +91,26 @@ int main(int argc, char** argv)
 
          sendto(sock, &kep, sizeof(kep) - 1,
              0, (struct sockaddr *)&addr, sizeof(addr));
+
       }
+      struct bgp_update *bgp_update =  (struct bgp_update *)buf;
+      if (bgp_update->type == BGP_MSG_TYPE_UPDATE) {
+
+         printf("BGP UPDATE! \n");
+         printf("send to... \n");
+
+         memcpy(upd.marker, marker, 16);
+
+         upd.len = htons(0x0017);
+
+         upd.type = 0x02;
+         upd.url = 0x0000;
+         upd.wr = 0x0000;
+
+         sendto(sock, &upd, sizeof(upd) - 1,
+             0, (struct sockaddr *)&addr, sizeof(addr));
      }
+    }
   close(sock);
   return 0;
 }

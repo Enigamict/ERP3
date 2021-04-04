@@ -11,7 +11,7 @@
 #define BGP_MSG_TYPE_ROUTEREFRESH 5
 
 #define BGP_MARKER 16
-#define BGP_OPEN_OPT 8
+#define BGP_OPEN_OPT 48
 
 struct bgp_open {
  uint8_t marker[BGP_MARKER];
