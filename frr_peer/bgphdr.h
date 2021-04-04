@@ -34,7 +34,7 @@ struct bgp_update {
  uint8_t marker[BGP_MARKER];
  uint16_t len;
  uint8_t type;
- uint16_t url;
- uint16_t wr;
+ uint16_t wl[2];
+ uint16_t pl;
 };
 
