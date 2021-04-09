@@ -39,7 +39,6 @@ int main(int argc, char** argv)
     0x65, 0x74, 0x31, 0x00, 0x02, 0x04, 0x40, 0x02, 0x00,
     0x78};
    
-    uint8_t wl[2] = {0x00, 0x00};
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -106,7 +105,7 @@ int main(int argc, char** argv)
 
          upd.type = 0x02;
 
-         memcpy(upd.wl, wl, 2);
+         upd.wl = 0x0000;
 
          upd.pl = 0x0000;
 
